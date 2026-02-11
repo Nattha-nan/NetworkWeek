@@ -19,7 +19,18 @@ def start_server():
                 # Set a timeout so we can check for keyboard interrupts
                 server_socket.settimeout(1.0)
                 try:
-                    conn, addr = server_socket.accept()
+                    while True:
+                        conn, addr = server_socket.accept()
+                        print(f"[SERVER] Connection from {addr}")
+
+                        data = conn.recv(BUFFER_SIZE)
+                        message = data.decode()
+                        print(f"[SERVER] Received: {message}")
+
+                        reply = f"ACK: {message}"
+                        conn.sendall(reply.encode())
+
+                        conn.close()
                 except socket.timeout:
                     continue
                 
