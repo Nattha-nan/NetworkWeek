@@ -1,3 +1,4 @@
+# python sender.py
 #Step 0: Shared Configuration
 # config.py
 HOST = "127.0.0.1"
