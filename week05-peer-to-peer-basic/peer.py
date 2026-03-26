@@ -7,8 +7,7 @@ from config import HOST, BASE_PORT, BUFFER_SIZE
 
 peer_id = int(sys.argv[1])
 PORT = BASE_PORT + peer_id
-# ________________________________________
-# Step 2: Listener Thread
+
 def listen():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind((HOST, PORT))
@@ -20,19 +19,27 @@ def listen():
         data = conn.recv(BUFFER_SIZE)
         print(f"[PEER {peer_id}] From {addr}: {data.decode()}")
         conn.close()
-# ________________________________________
-# Step 3: Sender Function
+
 def send_message(target_peer_id, message):
     target_port = BASE_PORT + target_peer_id
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((HOST, target_port))
-    sock.sendall(message.encode())
-    sock.close()
-#________________________________________
-# Step 4: Run Listener + Send Message
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((HOST, target_port))
+        sock.sendall(message.encode())
+        print(f"[PEER {peer_id}] Sent to {target_peer_id}: {message}")
+        sock.close()
+    except ConnectionRefusedError:
+        print(f"[PEER {peer_id}] ERROR: Peer {target_peer_id} not online")
+
 threading.Thread(target=listen, daemon=True).start()
 
 while True:
-    target = int(input("Send to peer ID: "))
-    msg = input("Message: ")
-    send_message(target, msg)
+    try:
+        target = int(input("Send to peer ID: "))
+        msg = input("Message: ")
+        send_message(target, msg)
+    except ValueError:
+        print("[PEER] Invalid ID")
+    except KeyboardInterrupt:
+        print(f"\n[PEER {peer_id}] Exit")
+        break

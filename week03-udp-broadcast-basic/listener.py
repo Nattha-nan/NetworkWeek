@@ -4,7 +4,10 @@ import socket
 from config import PORT, BUFFER_SIZE
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(("", PORT))  # Listen on all interfaces
+
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+sock.bind(("", PORT))
 
 print(f"[LISTENER] Listening for broadcast on port {PORT}")
 
